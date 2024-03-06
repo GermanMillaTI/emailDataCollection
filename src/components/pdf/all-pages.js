@@ -11,6 +11,7 @@ export default function SinglePage() {
     const [scale, setScale] = useState(1.5);
     const [pdfFile, setPdfFile] = useState(null);
     const [msgNumber, setMsgNumber] = useState(1);
+    const [messages, setMessages] = useState(Array.from({ length: 1 }, (_, i) => i + 1));
 
     const setAndLogSelection = useCallback(
         (highlightTip) => {
@@ -31,21 +32,27 @@ export default function SinglePage() {
         }
     };
 
+    const addMessage = () => {
+        setMsgNumber((prevMsgNumber) => prevMsgNumber + 1);
+        setMessages((prevMessages) => [...prevMessages, prevMessages.length + 1]);
+    };
+
+    console.log(messages)
+
+    const removeMessage = (index) => {
+        setMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+    };
 
     return (
         <div style={{ display: "flex", height: "100vh" }}>
             <input type="file" accept=".pdf" onChange={handleFileChange} />
             {pdfFile && (
                 <div style={{ flex: 1 }}>
-
                     <div>
                         <button onClick={() => setScale(scale - 0.25)}>Zoom out (-0.25)</button>
                         <button onClick={() => setScale(scale + 0.25)}>Zoom in (+0.25)</button>
                         <button onClick={() => setScale(1.5)}>Reset Zoom</button>
                     </div>
-
-
-
                     <PdfViewer
                         url={pdfFile}
                         selections={[]}
@@ -61,70 +68,77 @@ export default function SinglePage() {
             )}
 
             <div style={{ flex: 0.3, padding: "20px", overflowY: "auto", maxHeight: "100vh" }}>
-
-
                 {pdfFile && (
                     <div>
-
-                        <button onClick={() => setMsgNumber(msgNumber + 1)}>Add message</button>
+                        <button onClick={addMessage}>Add message</button>
                     </div>
                 )}
                 <hr />
 
-                {pdfFile && (Array.from({ length: msgNumber }, (_, i) => (
-                    <div key={i}>
-                        <div>Message: {i + 1}</div>
-                        <div>
-                            <button onClick={() => {
-                                try {
-                                    document.getElementById(`date_${i}`).value = selections["text"]
-                                } catch (e) {
-                                    console.log(e)
-                                }
-                            }}>
-                                Message Date
-                            </button>
-                            <textarea id={`date_${i}`}></textarea>
+                {pdfFile &&
+                    messages.map((messageIndex) => (
+                        <div key={messageIndex}>
+                            <div>Message: {messageIndex}</div>
+                            <div>
+                                <button
+                                    onClick={() => {
+                                        try {
+                                            document.getElementById(`date_${messageIndex}`).value = selections["text"];
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                    }}
+                                >
+                                    Message Date
+                                </button>
+                                <textarea id={`date_${messageIndex}`}></textarea>
+                            </div>
+                            <div>
+                                <button
+                                    onClick={() => {
+                                        try {
+                                            document.getElementById(`sender_${messageIndex}`).value = selections["text"];
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                    }}
+                                >
+                                    Sender
+                                </button>
+                                <textarea id={`sender_${messageIndex}`}></textarea>
+                            </div>
+                            <div>
+                                <button
+                                    onClick={() => {
+                                        try {
+                                            document.getElementById(`recipient_${messageIndex}`).value = selections["text"];
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                    }}
+                                >
+                                    Recipient
+                                </button>
+                                <textarea id={`recipient_${messageIndex}`}></textarea>
+                            </div>
+                            <div>
+                                <button
+                                    onClick={() => {
+                                        try {
+                                            document.getElementById(`body_${messageIndex}`).value = selections["text"];
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                    }}
+                                >
+                                    Email body
+                                </button>
+                                <textarea id={`body_${messageIndex}`} rows="10" cols="55"></textarea>
+                            </div>
+                            <button onClick={() => removeMessage(messageIndex - 1)}>Remove</button>
+                            <hr />
                         </div>
-                        <div>
-                            <button onClick={() => {
-                                try {
-                                    document.getElementById(`sender_${i}`).value = selections["text"]
-                                } catch (e) {
-                                    console.log(e)
-                                }
-                            }}>
-                                Sender
-                            </button>
-                            <textarea id={`sender_${i}`}></textarea>
-                        </div>
-                        <div>
-                            <button onClick={() => {
-                                try {
-                                    document.getElementById(`recipient_${i}`).value = selections["text"]
-                                } catch (e) {
-                                    console.log(e)
-                                }
-                            }}>
-                                Recipient
-                            </button>
-                            <textarea id={`recipient_${i}`}></textarea>
-                        </div>
-                        <div>
-                            <button onClick={() => {
-                                try {
-                                    document.getElementById(`body_${i}`).value = selections["text"]
-                                } catch (e) {
-                                    console.log(e)
-                                }
-                            }}>
-                                Email body
-                            </button>
-                            <textarea id={`body_${i}`} rows="10" cols="55"></textarea>
-                        </div>
-                        <hr />
-                    </div>
-                )))}
+                    ))}
             </div>
         </div>
     );
