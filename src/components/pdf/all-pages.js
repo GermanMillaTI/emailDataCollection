@@ -10,8 +10,15 @@ export default function SinglePage() {
     const [selections, setSelections] = useState([]);
     const [scale, setScale] = useState(1.5);
     const [pdfFile, setPdfFile] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const [msgNumber, setMsgNumber] = useState(null); // Initialize msgNumber with null
+    const [msgNumber, setMsgNumber] = useState(1);
+    const [messages, setMessages] = useState(Array.from({ length: 1 }, (_, i) => i + 1));
+
+    const setAndLogSelection = useCallback(
+        (highlightTip) => {
+            setSelections([highlightTip][0]);
+        },
+        [setSelections]
+    );
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -24,31 +31,15 @@ export default function SinglePage() {
     };
 
     const addMessage = () => {
-        const newMessage = {
-            id: new Date().getTime(), // Use a unique identifier for each message
-            selections: {},
-        };
-
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-        setMsgNumber(newMessage.id); // Set msgNumber to the new message's id
+        setMsgNumber((prevMsgNumber) => prevMsgNumber + 1);
+        setMessages((prevMessages) => [...prevMessages, prevMessages.length + 1]);
     };
 
-    const removeMessage = (id) => {
-        setMessages((prevMessages) => prevMessages.filter((message) => message.id !== id));
-    };
+    console.log(messages)
 
-    const setAndLogSelection = useCallback(
-        (highlightTip) => {
-            const updatedSelections = { ...selections, ...highlightTip };
-            setSelections(updatedSelections);
-            setMessages((prevMessages) =>
-                prevMessages.map((message) =>
-                    message.id === msgNumber ? { ...message, selections: updatedSelections } : message
-                )
-            );
-        },
-        [setSelections, setMessages, msgNumber, selections]
-    );
+    const removeMessage = (index) => {
+        setMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+    };
 
     return (
         <div style={{ display: "flex", height: "100vh" }}>
@@ -83,15 +74,14 @@ export default function SinglePage() {
                 <hr />
 
                 {pdfFile &&
-                    messages.map((message) => (
-                        <div key={message.id}>
-                            <div>Message ID: {message.id}</div>
+                    messages.map((messageIndex) => (
+                        <div key={messageIndex}>
+                            <div>Message: {messageIndex}</div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`date_${message.id}`).value =
-                                                message.selections["text"];
+                                            document.getElementById(`date_${messageIndex}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -99,14 +89,13 @@ export default function SinglePage() {
                                 >
                                     Message Date
                                 </button>
-                                <textarea id={`date_${message.id}`}></textarea>
+                                <textarea id={`date_${messageIndex}`}></textarea>
                             </div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`sender_${message.id}`).value =
-                                                message.selections["text"];
+                                            document.getElementById(`sender_${messageIndex}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -114,14 +103,13 @@ export default function SinglePage() {
                                 >
                                     Sender
                                 </button>
-                                <textarea id={`sender_${message.id}`}></textarea>
+                                <textarea id={`sender_${messageIndex}`}></textarea>
                             </div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`recipient_${message.id}`).value =
-                                                message.selections["text"];
+                                            document.getElementById(`recipient_${messageIndex}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -129,14 +117,13 @@ export default function SinglePage() {
                                 >
                                     Recipient
                                 </button>
-                                <textarea id={`recipient_${message.id}`}></textarea>
+                                <textarea id={`recipient_${messageIndex}`}></textarea>
                             </div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`body_${message.id}`).value =
-                                                message.selections["text"];
+                                            document.getElementById(`body_${messageIndex}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -144,9 +131,11 @@ export default function SinglePage() {
                                 >
                                     Email body
                                 </button>
-                                <textarea id={`body_${message.id}`} rows="10" cols="55"></textarea>
+                                <textarea id={`body_${messageIndex}`} rows="10" cols="55"></textarea>
                             </div>
-                            <button onClick={() => removeMessage(message.id)}>Remove</button>
+                            <button onClick={() => {
+                                removeMessage(messageIndex - 1);
+                            }}>Remove</button>
                             <hr />
                         </div>
                     ))}
