@@ -106,7 +106,7 @@ export default function SinglePage() {
                                 >
                                     Message Date
                                 </button>
-                                <textarea id={`date_${message.id}`} defaultValue={message.date}></textarea>
+                                <textarea id={`date_${message.id}`} defaultValue={message.date} readOnly={true}></textarea>
                             </div>
                             <div>
                                 <button
@@ -121,7 +121,7 @@ export default function SinglePage() {
                                 >
                                     Sender
                                 </button>
-                                <textarea id={`sender_${message.id}`} defaultValue={message.sender}></textarea>
+                                <textarea id={`sender_${message.id}`} defaultValue={message.sender} readOnly={true}></textarea>
                             </div>
                             <div>
                                 <button
@@ -151,7 +151,7 @@ export default function SinglePage() {
                                 >
                                     Recipient(s): {message['recipient'] == "" ? 0 : message['recipient'].split(",").length}
                                 </button>
-                                <textarea id={`recipient_${message.id}`} defaultValue={message.recipient}></textarea>
+                                <textarea id={`recipient_${message.id}`} defaultValue={message.recipient} cols="55" readOnly={true}></textarea>
                             </div>
 
                             <div>
@@ -167,7 +167,7 @@ export default function SinglePage() {
                                 >
                                     Email body
                                 </button>
-                                <textarea id={`body_${message.id}`} rows="10" cols="55" defaultValue={message.body}></textarea>
+                                <textarea id={`body_${message.id}`} rows="10" cols="55" defaultValue={message.body} readOnly={true}></textarea>
                             </div>
                             <button onClick={() => removeMessage(message.id)}>Remove</button>
                             <hr />
