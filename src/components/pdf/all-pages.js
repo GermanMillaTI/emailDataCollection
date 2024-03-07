@@ -11,7 +11,15 @@ export default function SinglePage() {
     const [scale, setScale] = useState(1.5);
     const [pdfFile, setPdfFile] = useState(null);
     const [msgNumber, setMsgNumber] = useState(1);
-    const [messages, setMessages] = useState(Array.from({ length: 1 }, (_, i) => i + 1));
+    const [messages, setMessages] = useState([
+        {
+            id: Date.now(),
+            date: "",
+            sender: "",
+            recipient: "",
+            body: "",
+        },
+    ]);
 
     const setAndLogSelection = useCallback(
         (highlightTip) => {
@@ -32,14 +40,23 @@ export default function SinglePage() {
 
     const addMessage = () => {
         setMsgNumber((prevMsgNumber) => prevMsgNumber + 1);
-        setMessages((prevMessages) => [...prevMessages, prevMessages.length + 1]);
+        setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+                id: Date.now(),
+                date: "",
+                sender: "",
+                recipient: "",
+                body: "",
+            },
+        ]);
     };
 
-    console.log(messages)
-
-    const removeMessage = (index) => {
-        setMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+    const removeMessage = (id) => {
+        setMessages((prevMessages) => prevMessages.filter((msg) => msg.id !== id));
     };
+
+    console.log(messages);
 
     return (
         <div style={{ display: "flex", height: "100vh" }}>
@@ -56,7 +73,6 @@ export default function SinglePage() {
                         selections={[]}
                         enableAreaSelection={() => areaSelectionActive}
                         SelectionType={"text"}
-                        onAreaSelection={setAndLogSelection}
                         onTextSelection={setAndLogSelection}
                         scale={scale}
                     >
@@ -74,14 +90,14 @@ export default function SinglePage() {
                 <hr />
 
                 {pdfFile &&
-                    messages.map((messageIndex) => (
-                        <div key={messageIndex}>
-                            <div>Message: {messageIndex}</div>
+                    messages.map((message) => (
+                        <div key={message.id}>
+                            <div>Message: {message.id}</div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`date_${messageIndex}`).value = selections["text"];
+                                            document.getElementById(`date_${message.id}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -89,13 +105,13 @@ export default function SinglePage() {
                                 >
                                     Message Date
                                 </button>
-                                <textarea id={`date_${messageIndex}`}></textarea>
+                                <textarea id={`date_${message.id}`} defaultValue={message.date}></textarea>
                             </div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`sender_${messageIndex}`).value = selections["text"];
+                                            document.getElementById(`sender_${message.id}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -103,13 +119,13 @@ export default function SinglePage() {
                                 >
                                     Sender
                                 </button>
-                                <textarea id={`sender_${messageIndex}`}></textarea>
+                                <textarea id={`sender_${message.id}`} defaultValue={message.sender}></textarea>
                             </div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`recipient_${messageIndex}`).value = selections["text"];
+                                            document.getElementById(`recipient_${message.id}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -117,13 +133,13 @@ export default function SinglePage() {
                                 >
                                     Recipient
                                 </button>
-                                <textarea id={`recipient_${messageIndex}`}></textarea>
+                                <textarea id={`recipient_${message.id}`} defaultValue={message.recipient}></textarea>
                             </div>
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`body_${messageIndex}`).value = selections["text"];
+                                            document.getElementById(`body_${message.id}`).value = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -131,11 +147,9 @@ export default function SinglePage() {
                                 >
                                     Email body
                                 </button>
-                                <textarea id={`body_${messageIndex}`} rows="10" cols="55"></textarea>
+                                <textarea id={`body_${message.id}`} rows="10" cols="55" defaultValue={message.body}></textarea>
                             </div>
-                            <button onClick={() => {
-                                removeMessage(messageIndex - 1);
-                            }}>Remove</button>
+                            <button onClick={() => removeMessage(message.id)}>Remove</button>
                             <hr />
                         </div>
                     ))}
