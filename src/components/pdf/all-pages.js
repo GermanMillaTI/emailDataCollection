@@ -98,6 +98,7 @@ export default function SinglePage() {
                                     onClick={() => {
                                         try {
                                             document.getElementById(`date_${message.id}`).value = selections["text"];
+                                            message['date'] = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -112,6 +113,7 @@ export default function SinglePage() {
                                     onClick={() => {
                                         try {
                                             document.getElementById(`sender_${message.id}`).value = selections["text"];
+                                            message['sender'] = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
@@ -125,21 +127,39 @@ export default function SinglePage() {
                                 <button
                                     onClick={() => {
                                         try {
-                                            document.getElementById(`recipient_${message.id}`).value = selections["text"];
+                                            const currentRecipient = document.getElementById(`recipient_${message.id}`).value;
+                                            const selectedRecipient = selections["text"];
+
+                                            // Check if the current recipient is not empty
+                                            if (currentRecipient.trim() !== "") {
+                                                const currentRecipientsArray = currentRecipient.split(',');
+
+                                                if (!currentRecipientsArray.includes(selectedRecipient)) {
+                                                    currentRecipientsArray.push(selectedRecipient);
+                                                }
+
+                                                document.getElementById(`recipient_${message.id}`).value = currentRecipientsArray.join(',');
+                                            } else {
+                                                document.getElementById(`recipient_${message.id}`).value = selectedRecipient;
+                                            }
+
+                                            message['recipient'] = document.getElementById(`recipient_${message.id}`).value;
                                         } catch (e) {
                                             console.log(e);
                                         }
                                     }}
                                 >
-                                    Recipient
+                                    Recipient(s): {message['recipient'] == "" ? 0 : message['recipient'].split(",").length}
                                 </button>
                                 <textarea id={`recipient_${message.id}`} defaultValue={message.recipient}></textarea>
                             </div>
+
                             <div>
                                 <button
                                     onClick={() => {
                                         try {
                                             document.getElementById(`body_${message.id}`).value = selections["text"];
+                                            message['body'] = selections["text"];
                                         } catch (e) {
                                             console.log(e);
                                         }
